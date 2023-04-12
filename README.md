@@ -5,10 +5,10 @@
 ## Description
 
 Based on the [Nest](https://github.com/nestjs/nest) starter repository.
-Leverages [TypeORM]() 
-Leverages [Prisma]() 
-Leverages [Sequelize]() kinda 
-Based on Entities from [Bloom]()
+Leverages [TypeORM](https://typeorm.io/) 
+Leverages [Prisma](https://www.prisma.io/) 
+Leverages [Sequelize](https://sequelize.org/) kinda 
+Based on Entities from [Bloom](https://github.com/bloom-housing/bloom)
 
 This is a PoC/experiment to test a few different ORMs with how Bloom set up its entities. 
 This for sure could use some clean up, but the query meta data should still stay relevent.

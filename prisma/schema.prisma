@@ -1,0 +1,378 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL_PRISMA")
+}
+
+model address {
+  id                                                   String    @id(map: "PK_d92de1f82754668b5f5f5dd4fd5") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt                                            DateTime  @default(now()) @db.Timestamp(6)
+  updatedAt                                            DateTime  @default(now()) @db.Timestamp(6)
+  placeName                                            String?
+  city                                                 String?
+  county                                               String?
+  state                                                String?
+  street                                               String?
+  street2                                              String?
+  zipCode                                              String?
+  latitude                                             Decimal?  @db.Decimal
+  longitude                                            Decimal?  @db.Decimal
+  listing_listing_buildingAddressIdToaddress           listing[] @relation("listing_buildingAddressIdToaddress")
+  listing_listing_applicationMailingAddressIdToaddress listing[] @relation("listing_applicationMailingAddressIdToaddress")
+  listing_listing_applicationDropOffAddressIdToaddress listing[] @relation("listing_applicationDropOffAddressIdToaddress")
+  listing_listing_applicationPickUpAddressIdToaddress  listing[] @relation("listing_applicationPickUpAddressIdToaddress")
+  listing_listing_leasingAgentAddressIdToaddress       listing[] @relation("listing_leasingAgentAddressIdToaddress")
+}
+
+model ami_chart {
+  id             String        @id(map: "PK_e079bbfad233fdc79072acb33b5") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt      DateTime      @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime      @default(now()) @db.Timestamp(6)
+  items          Json
+  name           String        @db.VarChar
+  jurisdictionId String        @db.Uuid
+  jurisdictions  jurisdictions @relation(fields: [jurisdictionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_b8a41c7dc2999e112a4cc78c1c5")
+  units          units[]
+}
+
+model application_methods {
+  id                            String                        @id(map: "PK_c58506819ffaba3863a4edc5e9e") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt                     DateTime                      @default(now()) @db.Timestamp(6)
+  updatedAt                     DateTime                      @default(now()) @db.Timestamp(6)
+  type                          application_methods_type_enum
+  label                         String?
+  externalReference             String?
+  acceptsPostmarkedApplications Boolean?
+  phoneNumber                   String?
+  listingId                     String?                       @db.Uuid
+  listing                       listing?                      @relation(fields: [listingId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_0abcb167f766500e17ea573a6b8")
+  paper_applications            paper_applications[]
+}
+
+model assets {
+  id                                                      String               @id(map: "PK_da96729a8b113377cfb6a62439c") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt                                               DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt                                               DateTime             @default(now()) @db.Timestamp(6)
+  fileId                                                  String
+  label                                                   String
+  listing_listing_resultIdToassets                        listing[]            @relation("listing_resultIdToassets")
+  listing_listing_buildingSelectionCriteriaFileIdToassets listing[]            @relation("listing_buildingSelectionCriteriaFileIdToassets")
+  paper_applications                                      paper_applications[]
+}
+
+model jurisdictions {
+  id                          String                         @id(map: "PK_7cc0bed21c9e2b32866c1109ec5") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt                   DateTime                       @default(now()) @db.Timestamp(6)
+  updatedAt                   DateTime                       @default(now()) @db.Timestamp(6)
+  name                        String                         @unique(map: "UQ_60b3294568b273d896687dea59f")
+  notificationsSignUpURL      String?
+  languages                   jurisdictions_languages_enum[] @default([en])
+  partnerTerms                String?
+  publicUrl                   String                         @default("")
+  emailFromAddress            String?
+  rentalAssistanceDefault     String
+  enablePartnerSettings       Boolean                        @default(false)
+  enableAccessibilityFeatures Boolean                        @default(false)
+  enableUtilitiesIncluded     Boolean                        @default(false)
+  ami_chart                   ami_chart[]
+  listing                     listing[]
+  reserved_community_types    reserved_community_types[]
+}
+
+model listing {
+  id                                                     String                                      @id(map: "PK_381d45ebb8692362c156d6b87d7") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt                                              DateTime                                    @default(now()) @db.Timestamp(6)
+  updatedAt                                              DateTime                                    @default(now()) @db.Timestamp(6)
+  additionalApplicationSubmissionNotes                   String?
+  digitalApplication                                     Boolean?
+  commonDigitalApplication                               Boolean?
+  paperApplication                                       Boolean?
+  referralOpportunity                                    Boolean?
+  accessibility                                          String?
+  amenities                                              String?
+  buildingTotalUnits                                     Int?
+  developer                                              String?
+  householdSizeMax                                       Int?
+  householdSizeMin                                       Int?
+  neighborhood                                           String?
+  petPolicy                                              String?
+  smokingPolicy                                          String?
+  unitsAvailable                                         Int?
+  unitAmenities                                          String?
+  servicesOffered                                        String?
+  yearBuilt                                              Int?
+  applicationDueDate                                     DateTime?                                   @db.Timestamptz(6)
+  applicationOpenDate                                    DateTime?                                   @db.Timestamptz(6)
+  applicationFee                                         String?
+  applicationOrganization                                String?
+  applicationPickUpAddressOfficeHours                    String?
+  applicationDropOffAddressOfficeHours                   String?
+  buildingSelectionCriteria                              String?
+  costsNotIncluded                                       String?
+  creditHistory                                          String?
+  criminalBackground                                     String?
+  depositMin                                             String?
+  depositMax                                             String?
+  depositHelperText                                      String?
+  disableUnitsAccordion                                  Boolean?
+  leasingAgentEmail                                      String?
+  leasingAgentName                                       String?
+  leasingAgentOfficeHours                                String?
+  leasingAgentPhone                                      String?
+  leasingAgentTitle                                      String?
+  postmarkedApplicationsReceivedByDate                   DateTime?                                   @db.Timestamptz(6)
+  programRules                                           String?
+  rentalAssistance                                       String?
+  rentalHistory                                          String?
+  requiredDocuments                                      String?
+  specialNotes                                           String?
+  waitlistCurrentSize                                    Int?
+  waitlistMaxSize                                        Int?
+  whatToExpect                                           String?
+  displayWaitlistSize                                    Boolean
+  reservedCommunityDescription                           String?
+  reservedCommunityMinAge                                Int?
+  resultLink                                             String?
+  isWaitlistOpen                                         Boolean?
+  waitlistOpenSpots                                      Int?
+  customMapPin                                           Boolean?
+  publishedAt                                            DateTime?                                   @db.Timestamptz(6)
+  closedAt                                               DateTime?                                   @db.Timestamptz(6)
+  afsLastRunAt                                           DateTime?                                   @default(dbgenerated("'1970-01-01 00:00:00-07'::timestamp with time zone")) @db.Timestamptz(6)
+  lastApplicationUpdateAt                                DateTime?                                   @default(dbgenerated("'1970-01-01 00:00:00-07'::timestamp with time zone")) @db.Timestamptz(6)
+  assets                                                 Json
+  applicationPickUpAddressType                           listing_applicationpickupaddresstype_enum?
+  applicationDropOffAddressType                          listing_applicationdropoffaddresstype_enum?
+  applicationMailingAddressType                          listing_applicationmailingaddresstype_enum?
+  reviewOrderType                                        listing_reviewordertype_enum?
+  status                                                 listing_status_enum                         @default(pending)
+  buildingSelectionCriteriaFileId                        String?                                     @db.Uuid
+  resultId                                               String?                                     @db.Uuid
+  buildingAddressId                                      String?                                     @db.Uuid
+  applicationPickUpAddressId                             String?                                     @db.Uuid
+  applicationDropOffAddressId                            String?                                     @db.Uuid
+  applicationMailingAddressId                            String?                                     @db.Uuid
+  leasingAgentAddressId                                  String?                                     @db.Uuid
+  utilitiesId                                            String?                                     @unique(map: "UQ_74bd88151e20c187ca30d8b268a") @db.Uuid
+  featuresId                                             String?                                     @unique(map: "UQ_f418645e741f5ef0747371815d9") @db.Uuid
+  reservedCommunityTypeId                                String?                                     @db.Uuid
+  jurisdictionId                                         String?                                     @db.Uuid
+  name                                                   String
+  application_methods                                    application_methods[]
+  jurisdictions                                          jurisdictions?                              @relation(fields: [jurisdictionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_05cb93d9df77a13c4b9b508af39")
+  assets_listing_resultIdToassets                        assets?                                     @relation("listing_resultIdToassets", fields: [resultId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_159984c34c528e487f80808ec93")
+  reserved_community_types                               reserved_community_types?                   @relation(fields: [reservedCommunityTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_4a28afee82ccfef5fe2930b61b2")
+  address_listing_buildingAddressIdToaddress             address?                                    @relation("listing_buildingAddressIdToaddress", fields: [buildingAddressId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_6fc1b8d8693b24264ad9d938ad1")
+  listing_utilities                                      listing_utilities?                          @relation(fields: [utilitiesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_74bd88151e20c187ca30d8b268a")
+  address_listing_applicationMailingAddressIdToaddress   address?                                    @relation("listing_applicationMailingAddressIdToaddress", fields: [applicationMailingAddressId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_79f1b0701cff87f59801c0ec605")
+  address_listing_applicationDropOffAddressIdToaddress   address?                                    @relation("listing_applicationDropOffAddressIdToaddress", fields: [applicationDropOffAddressId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_802418917a90c0349ea86e1ebd0")
+  address_listing_applicationPickUpAddressIdToaddress    address?                                    @relation("listing_applicationPickUpAddressIdToaddress", fields: [applicationPickUpAddressId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_bb82b66bb4e3c2cf10f58863ca9")
+  assets_listing_buildingSelectionCriteriaFileIdToassets assets?                                     @relation("listing_buildingSelectionCriteriaFileIdToassets", fields: [buildingSelectionCriteriaFileId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_cb02f686107734d0a808e4fe929")
+  address_listing_leasingAgentAddressIdToaddress         address?                                    @relation("listing_leasingAgentAddressIdToaddress", fields: [leasingAgentAddressId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_e03e295bada01235c36af433689")
+  listing_features                                       listing_features?                           @relation(fields: [featuresId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f418645e741f5ef0747371815d9")
+  units                                                  units[]
+  units_summary                                          units_summary[]
+}
+
+model listing_features {
+  id                    String   @id(map: "PK_88e4fe3e46d21d8b4fdadeb7599") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt             DateTime @default(now()) @db.Timestamp(6)
+  updatedAt             DateTime @default(now()) @db.Timestamp(6)
+  elevator              Boolean?
+  wheelchairRamp        Boolean?
+  serviceAnimalsAllowed Boolean?
+  accessibleParking     Boolean?
+  parkingOnSite         Boolean?
+  inUnitWasherDryer     Boolean?
+  laundryInBuilding     Boolean?
+  barrierFreeEntrance   Boolean?
+  rollInShower          Boolean?
+  grabBars              Boolean?
+  heatingInUnit         Boolean?
+  acInUnit              Boolean?
+  hearing               Boolean?
+  visual                Boolean?
+  mobility              Boolean?
+  listing               listing?
+}
+
+model listing_utilities {
+  id          String   @id(map: "PK_8e88f883b389f7b31d331de764f") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+  updatedAt   DateTime @default(now()) @db.Timestamp(6)
+  water       Boolean?
+  gas         Boolean?
+  trash       Boolean?
+  sewer       Boolean?
+  electricity Boolean?
+  cable       Boolean?
+  phone       Boolean?
+  internet    Boolean?
+  listing     listing?
+}
+
+model migrations {
+  id        Int    @id(map: "PK_8c82d7f526340ab734260ea46be") @default(autoincrement())
+  timestamp BigInt
+  name      String @db.VarChar
+}
+
+model paper_applications {
+  id                  String               @id(map: "PK_1bc5b0234d874ec03f500621d43") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt           DateTime             @default(now()) @db.Timestamp(6)
+  updatedAt           DateTime             @default(now()) @db.Timestamp(6)
+  language            String               @db.VarChar
+  fileId              String?              @db.Uuid
+  applicationMethodId String?              @db.Uuid
+  application_methods application_methods? @relation(fields: [applicationMethodId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_216acc2a40690ddfbb8e1f76b96")
+  assets              assets?              @relation(fields: [fileId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_b1964b2d94bbe497c92f2ad4677")
+}
+
+model reserved_community_types {
+  id             String        @id(map: "PK_af3937276e7bb53c30159d6ca0b") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt      DateTime      @default(now()) @db.Timestamp(6)
+  updatedAt      DateTime      @default(now()) @db.Timestamp(6)
+  name           String
+  description    String?
+  jurisdictionId String        @db.Uuid
+  listing        listing[]
+  jurisdictions  jurisdictions @relation(fields: [jurisdictionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_5be13b4adc1c5a1f9489d0fd4a9")
+}
+
+model unit_accessibility_priority_types {
+  id            String          @id(map: "PK_2cf31d2ceea36e6a6b970608565") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt     DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime        @default(now()) @db.Timestamp(6)
+  name          String
+  units         units[]
+  units_summary units_summary[]
+}
+
+model unit_ami_chart_overrides {
+  id        String   @id(map: "PK_839676df1bd1ac12ff09b9d920d") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @db.Timestamp(6)
+  items     Json
+  units     units?
+}
+
+model unit_rent_types {
+  id        String   @id(map: "PK_fb6b318fdee0a5b30521f63c516") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @db.Timestamp(6)
+  name      String
+  units     units[]
+}
+
+model unit_types {
+  id            String          @id(map: "PK_105c42fcf447c1da21fd20bcb85") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt     DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime        @default(now()) @db.Timestamp(6)
+  name          String
+  numBedrooms   Int
+  units         units[]
+  units_summary units_summary[]
+}
+
+model units {
+  id                                String                             @id(map: "PK_5a8f2f064919b587d93936cb223") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt                         DateTime                           @default(now()) @db.Timestamp(6)
+  updatedAt                         DateTime                           @default(now()) @db.Timestamp(6)
+  amiPercentage                     String?
+  annualIncomeMin                   String?
+  monthlyIncomeMin                  String?
+  floor                             Int?
+  annualIncomeMax                   String?
+  maxOccupancy                      Int?
+  minOccupancy                      Int?
+  monthlyRent                       String?
+  numBathrooms                      Int?
+  numBedrooms                       Int?
+  number                            String?
+  sqFeet                            Decimal?                           @db.Decimal(8, 2)
+  monthlyRentAsPercentOfIncome      Decimal?                           @db.Decimal(8, 2)
+  bmrProgramChart                   Boolean?
+  amiChartId                        String?                            @db.Uuid
+  listingId                         String?                            @db.Uuid
+  unitTypeId                        String?                            @db.Uuid
+  unitRentTypeId                    String?                            @db.Uuid
+  priorityTypeId                    String?                            @db.Uuid
+  amiChartOverrideId                String?                            @unique(map: "REL_f55ea8f8c0836b0936c4f30f6f") @db.Uuid
+  unit_accessibility_priority_types unit_accessibility_priority_types? @relation(fields: [priorityTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_08309a32e483162c40fd68c5964")
+  ami_chart                         ami_chart?                         @relation(fields: [amiChartId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_08d3fb9e9f12edf0716f7389e6b")
+  listing                           listing?                           @relation(fields: [listingId], references: [id], onDelete: Cascade, map: "FK_67937fce5ec44a6213b65e70ad4")
+  unit_rent_types                   unit_rent_types?                   @relation(fields: [unitRentTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_de94510355a61ecc4d18ae63ba1")
+  unit_ami_chart_overrides          unit_ami_chart_overrides?          @relation(fields: [amiChartOverrideId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_f55ea8f8c0836b0936c4f30f6fc")
+  unit_types                        unit_types?                        @relation(fields: [unitTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_fe0cd232c5b6624c3181f31bb11")
+}
+
+model units_summary {
+  id                                String                             @id(map: "PK_8d8c4940fab2a9d1b2e7ddd9e49") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt                         DateTime                           @default(now()) @db.Timestamp(6)
+  updatedAt                         DateTime                           @default(now()) @db.Timestamp(6)
+  monthlyRentMin                    Int?
+  monthlyRentMax                    Int?
+  monthlyRentAsPercentOfIncome      Decimal?                           @db.Decimal(8, 2)
+  amiPercentage                     Int?
+  minimumIncomeMin                  String?
+  minimumIncomeMax                  String?
+  maxOccupancy                      Int?
+  minOccupancy                      Int?
+  floorMin                          Int?
+  floorMax                          Int?
+  sqFeetMin                         Decimal?                           @db.Decimal(8, 2)
+  sqFeetMax                         Decimal?                           @db.Decimal(8, 2)
+  totalCount                        Int?
+  totalAvailable                    Int?
+  unitTypeId                        String?                            @db.Uuid
+  listingId                         String?                            @db.Uuid
+  priorityTypeId                    String?                            @db.Uuid
+  unit_accessibility_priority_types unit_accessibility_priority_types? @relation(fields: [priorityTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_13220176bbd907be318103a68fd")
+  listing                           listing?                           @relation(fields: [listingId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_2b53e191e2cfbdba48e5623e907")
+  unit_types                        unit_types?                        @relation(fields: [unitTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_90e5006d4b33714ac6b9be2b9b1")
+}
+
+enum application_methods_type_enum {
+  Internal
+  FileDownload
+  ExternalLink
+  PaperPickup
+  POBox
+  LeasingAgent
+  Referral
+}
+
+enum jurisdictions_languages_enum {
+  en
+  es
+  vi
+  zh
+  tl
+}
+
+enum listing_applicationdropoffaddresstype_enum {
+  leasingAgent
+}
+
+enum listing_applicationmailingaddresstype_enum {
+  leasingAgent
+}
+
+enum listing_applicationpickupaddresstype_enum {
+  leasingAgent
+}
+
+enum listing_reviewordertype_enum {
+  lottery
+  firstComeFirstServe
+  waitlist
+}
+
+enum listing_status_enum {
+  active
+  pending
+  closed
+}

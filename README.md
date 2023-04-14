@@ -22,6 +22,7 @@ make sure the .env file's db placement is what you're looking for
 ```bash
 $ yarn typeorm:setup
 $ yarn prisma:setup
+$ yarn sequelize:setup
 ```
 Hit http://localhost:3000/typeorm_seeding & http://localhost:3000/prisma_seeding to seed starting data after you have started the app
 
